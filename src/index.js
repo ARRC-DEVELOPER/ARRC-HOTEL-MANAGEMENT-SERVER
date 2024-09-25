@@ -31,6 +31,7 @@ const settingsRoutes = require("../routes/settingRoute");
 const salseRoute = require("../routes/salseRoute");
 const purchaseAccountRoute = require("../routes/purchaseAccountRoutes");
 const payrollRoute = require("../routes/payrollRoutes");
+const cookieParser = require("cookie-parser");
 
 const path = require("path");
 
@@ -55,6 +56,7 @@ app.use(
 
 app.use(bodyParser.json());
 app.use(express.json());
+app.use(cookieParser());
 
 // Static file serving
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

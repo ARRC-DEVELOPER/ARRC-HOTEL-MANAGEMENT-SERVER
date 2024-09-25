@@ -35,7 +35,6 @@ exports.getSettings = async (req, res) => {
 
 exports.updateSettings = async (req, res) => {
   try {
-    console.log("Working here...");
     const updates = req.body;
     if (req.file) {
       updates[req.file.fieldname] = req.file.location; // Get file URL from S3

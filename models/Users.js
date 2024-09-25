@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
 
     mobile: { type: String },
 
-    password: { type: String },
+    password: { type: String, required: true },
 
     role: {
       type: String,
@@ -18,7 +18,26 @@ const userSchema = new mongoose.Schema(
       default: "staff",
     },
 
-    permissions: [{ type: String }],
+    permissions: {
+      type: [String],
+      enum: [
+        "Dashboard",
+        "Sale",
+        "Purchase",
+        "Table",
+        "Food",
+        "Ingradients",
+        "Accounting",
+        "People",
+        "Reports",
+        "HRM",
+        "Users",
+        "Utilities",
+        "Settings",
+        "My Account",
+      ],
+      default: [],
+    },
   },
 
   { timestamps: true }

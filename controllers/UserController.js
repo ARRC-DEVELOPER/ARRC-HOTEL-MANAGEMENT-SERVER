@@ -13,7 +13,7 @@ const {
 const getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);
+    res.json(users);  
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -42,6 +42,7 @@ const createUser = async (req, res) => {
     role,
     permissions,
   });
+
   try {
     const newUser = await user.save();
     res.status(201).json(newUser);
@@ -55,17 +56,17 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return next(new ErrorHandler("Please enter all fields", 400));
+      return res.status(401).json({ message: "Please enter all fields" });
     }
 
     const user = await checkUserExists(email);
     if (!user) {
-      return next(new ErrorHandler("User dosen't exist.", 401));
+      return res.status(401).json({ message: "Incorrect email or password." });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return next(new ErrorHandler("Incorrect email or password.", 401));
+      return res.status(401).json({ message: "Incorrect email or password." });
     }
 
     sendToken(res, user, `${user.username}, Logged In Successfully.`, 200);
@@ -88,13 +89,32 @@ const logout = async (req, res, next) => {
     });
 };
 
+const getMyProfile = async (req, res, next) => {
+  try {
+    if(!req.userId) {
+      return res.status(404).json({ message: "Login First!"});
+    }
+    const user = await findUser(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 const updateUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    const newUser = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
-    if (user) {
-      res.json(user);
+    if (newUser) {
+      res.json(newUser);
     } else {
       res.status(404).json({ message: "User not found" });
     }
@@ -107,7 +127,7 @@ const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (user) {
-      res.json({ message: "User deleted" });
+      res.json({ message: `User ${user.username} deleted by admin.` });
     } else {
       res.status(404).json({ message: "User not found" });
     }
@@ -124,4 +144,5 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  getMyProfile,
 };

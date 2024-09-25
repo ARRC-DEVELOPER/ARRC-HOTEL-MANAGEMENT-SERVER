@@ -1,13 +1,11 @@
-import jwt from "jsonwebtoken";
-import { cathAsynError } from "./cathAsyncError.js";
-import ErrorHandler from "../utils/errorHandler.js";
-import { userServices } from "../services/userServices.js";
+const jwt = require("jsonwebtoken");
+const { userServices } = require("../services/userServices.js")
 const { findUser } = userServices;
 
-export const isAuthenticated = cathAsynError(async (req, res, next) => {
+const isAuthenticated = async (req, res, next) => {
   const { token } = req.cookies;
 
-  if (!token) return next(new ErrorHandler("User not logged in..", 401));
+  if (!token) return res.status(404).json({ message: "User not found" });
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -15,9 +13,9 @@ export const isAuthenticated = cathAsynError(async (req, res, next) => {
   req.userId = decoded._id;
 
   next();
-});
+};
 
-export const authorizedAdmin = (req, res, next) => {
+const authorizedAdmin = (req, res, next) => {
   if (req.user.role !== "admin") {
     return next(
       new ErrorHandler(
@@ -29,12 +27,18 @@ export const authorizedAdmin = (req, res, next) => {
   next();
 };
 
-export const authorizedSubscribers = (req, res, next) => {
+const authorizedSubscribers = (req, res, next) => {
   if (req.user.subscription.status !== "active" && req.user.role !== "admin") {
-    return next(
-      new ErrorHandler(`Only subscribers can access this resource.`)
-    );
+    return res
+      .status(404)
+      .json({ message: "Only subscribers can access this" });
   }
 
   next();
+};
+
+module.exports = {
+  isAuthenticated,
+  authorizedAdmin,
+  authorizedSubscribers,
 };
