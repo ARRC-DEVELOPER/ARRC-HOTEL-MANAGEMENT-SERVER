@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const PurchaseAccountSchema = new mongoose.Schema({
-  accountName: {
+  name: {
     type: String,
     required: true,
   },

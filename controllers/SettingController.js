@@ -1,54 +1,53 @@
 const Settings = require('../models/Setting');
-const AWS = require('aws-sdk');
-const multer = require('multer');
-const multerS3 = require('multer-s3');
-const path = require('path');
+const { uploadToS3 } = require("../middlewares/singleUpload");
 
-// AWS S3 setup
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
-});
-
-// Multer setup
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.SETTINGDATA_BUCKET_NAME,
-    acl: 'public-read',
-    key: function (req, file, cb) {
-      cb(null, `settings/${Date.now()}${path.extname(file.originalname)}`);
-    }
-  })
-});
-
-// Controller methods
 exports.getSettings = async (req, res) => {
   try {
     const settings = await Settings.findOne();
-    res.json(settings);
+
+    res.status(200).json({
+      success: true,
+      message: "General Settings fetched successfully!",
+      settings,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching settings', error });
+    res.status(500).json({ error: 'Error fetching settings' });
   }
 };
 
 exports.updateSettings = async (req, res) => {
-  try {
-    console.log("Working here...");
-    const updates = req.body;
-    if (req.file) {
-      updates[req.file.fieldname] = req.file.location; // Get file URL from S3
-    }
+  const { appName, defaultCustomer, saleAccount, purchaseAccount, payrollAccount, copyright, sendInvoiceEmail } = req.body;
 
-    const settings = await Settings.findOneAndUpdate({}, updates, { new: true, upsert: true });
-    res.json(settings);
+  let settings = await Settings.findOne();
+  if (!settings) {
+    settings = new Settings();
+  }
+
+  settings.appName = appName;
+  settings.defaultCustomer = defaultCustomer;
+  settings.saleAccount = saleAccount;
+  settings.purchaseAccount = purchaseAccount;
+  settings.payrollAccount = payrollAccount;
+  settings.copyright = copyright;
+  settings.sendInvoiceEmail = sendInvoiceEmail === 'true';
+
+  // Upload images to S3
+  if (req.files['logo']) {
+    settings.logo = await uploadToS3(req.files['logo'][0], 'logo');
+  }
+
+  if (req.files['favicon']) {
+    settings.favicon = await uploadToS3(req.files['favicon'][0], 'favicon');
+  }
+
+  if (req.files['preloader']) {
+    settings.preloader = await uploadToS3(req.files['preloader'][0], 'preloader');
+  }
+
+  try {
+    await settings.save();
+    res.status(200).json(settings);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating settings', error });
+    res.status(500).json({ error: 'Error updating settings' });
   }
 };
-
-// Setup multer for file uploads
-exports.uploadLogo = upload.single('logo');
-exports.uploadFavicon = upload.single('favicon');
-exports.uploadPreloader = upload.single('preloader');

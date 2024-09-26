@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const PayrollAccountSchema = new mongoose.Schema({
-  accountName: {
+  name: {
     type: String,
     required: true,
   },

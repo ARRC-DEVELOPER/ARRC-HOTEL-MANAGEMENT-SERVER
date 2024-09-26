@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const settingsController = require('../controllers/SettingController');
 
-// Route to get settings
-router.get('/settings', settingsController.getSettings);
+const upload = multer({ dest: 'uploads/' });
 
-// Route to update settings
-router.post('/settings', 
-  settingsController.uploadLogo,
-  settingsController.uploadFavicon,
-  settingsController.uploadPreloader,
-  settingsController.updateSettings
-);
+router.get('/getGeneralSettings', settingsController.getSettings);
+router.post('/updateGeneralSettings', upload.fields([
+  { name: 'logo' },
+  { name: 'favicon' },
+  { name: 'preloader' }
+]), settingsController.updateSettings);
+
 
 module.exports = router;

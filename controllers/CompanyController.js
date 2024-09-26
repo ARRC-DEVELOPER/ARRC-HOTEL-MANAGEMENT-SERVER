@@ -1,52 +1,57 @@
-// backend/controllers/companyController.js
 const Company = require('../models/Company');
 
-// Create company
-exports.createCompany = async (req, res) => {
+exports.getCompanyDetails = async (req, res) => {
     try {
-        const company = new Company(req.body);
+        const company = await Company.findOne();
+
+        res.status(200).json({
+            success: true,
+            message: 'Company details fetched successfully!',
+            company,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error,
+        });
+    }
+};
+
+exports.updateCompanyDetails = async (req, res) => {
+    const { companyName, companyEmail, companyPhone, companyTaxNumber, companyAddress } = req.body;
+
+    try {
+        let company = await Company.findOne();
+
+        if (!company) {
+            company = new Company({
+                companyName,
+                companyEmail,
+                companyPhone,
+                companyTaxNumber,
+                companyAddress,
+            });
+        } else {
+            company.companyName = companyName;
+            company.companyEmail = companyEmail;
+            company.companyPhone = companyPhone;
+            company.companyTaxNumber = companyTaxNumber;
+            company.companyAddress = companyAddress;
+        }
+
         await company.save();
-        res.status(201).json({ message: 'Company created successfully!' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating company', error });
-    }
-};
 
-// Get company details
-exports.getCompany = async (req, res) => {
-    try {
-        const company = await Company.findOne(); // Adjust this if you need to find by ID or other criteria
-        if (!company) {
-            return res.status(404).json({ message: 'Company not found' });
-        }
-        res.status(200).json(company);
+        res.status(200).json({
+            success: true,
+            message: 'Company details updated successfully!',
+            company,
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching company', error });
-    }
-};
-
-// Edit company
-exports.editCompany = async (req, res) => {
-    try {
-        const company = await Company.findOneAndUpdate({}, req.body, { new: true });
-        if (!company) {
-            return res.status(404).json({ message: 'Company not found' });
-        }
-        res.status(200).json({ message: 'Company updated successfully!', company });
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating company', error });
-    }
-};
-
-// Delete company
-exports.deleteCompany = async (req, res) => {
-    try {
-        const company = await Company.findOneAndDelete();
-        if (!company) {
-            return res.status(404).json({ message: 'Company not found' });
-        }
-        res.status(200).json({ message: 'Company deleted successfully!' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting company', error });
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error,
+        });
     }
 };
