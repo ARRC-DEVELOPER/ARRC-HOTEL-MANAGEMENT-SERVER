@@ -1,10 +1,11 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const taxRateController = require('../controllers/TaxRatesController');
+const taxRateController = require("../controllers/TaxRatesController");
 
-router.get('/', taxRateController.getTaxRates);
-router.post('/', taxRateController.createTaxRate);
-router.put('/:id', taxRateController.updateTaxRate);
-router.delete('/:id', taxRateController.deleteTaxRate);
+router.get("/getTaxRates", taxRateController.getTaxRates);
+router.post("/createTaxRate", taxRateController.createTaxRate);
+router.put("/updateTaxRate/:id", taxRateController.updateTaxRate);
+router.put("/updateDefault/:id", taxRateController.updateDefault);
+router.delete("/deleteTaxRate/:id", taxRateController.deleteTaxRate);
 
 module.exports = router;
