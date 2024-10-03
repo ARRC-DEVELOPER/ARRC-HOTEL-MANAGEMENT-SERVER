@@ -13,6 +13,18 @@ router.get(
   authorizedAdmin,
   userController.getUsers
 );
+router.get(
+  "/getAllWaiters",
+  isAuthenticated,
+  authorizedAdmin,
+  userController.getAllWaiters
+);
+router.get(
+  "/getAllDrivers",
+  isAuthenticated,
+  authorizedAdmin,
+  userController.getAllDrivers
+);
 router.get("/getUser/:id", userController.getUserById);
 router.put(
   "/updateUser/:id",

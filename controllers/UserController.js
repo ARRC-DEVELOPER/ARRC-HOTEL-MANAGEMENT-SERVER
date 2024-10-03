@@ -13,7 +13,25 @@ const {
 const getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);  
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getAllWaiters = async (req, res) => {
+  try {
+    const waiters = await User.find({ role: "waiter" });
+    res.json(waiters);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getAllDrivers = async (req, res) => {
+  try {
+    const drivers = await User.find({ role: "deliveryMan" });
+    res.json(drivers);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -91,8 +109,8 @@ const logout = async (req, res, next) => {
 
 const getMyProfile = async (req, res, next) => {
   try {
-    if(!req.userId) {
-      return res.status(404).json({ message: "Login First!"});
+    if (!req.userId) {
+      return res.status(404).json({ message: "Login First!" });
     }
     const user = await findUser(req.userId);
     if (!user) {
@@ -140,6 +158,8 @@ module.exports = {
   login,
   logout,
   getUsers,
+  getAllWaiters,
+  getAllDrivers,
   getUserById,
   createUser,
   updateUser,

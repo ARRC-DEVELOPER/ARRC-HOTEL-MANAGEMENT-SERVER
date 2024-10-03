@@ -4,10 +4,10 @@ const router = express.Router();
 const ingredientController = require('../controllers/IngredientController');
 
 // CRUD routes for ingredients
-router.get('/', ingredientController.getAllIngredients);
-router.get('/:id', ingredientController.getIngredientById);
-router.post('/', ingredientController.createIngredient);
-router.put('/:id', ingredientController.updateIngredient);
-router.delete('/:id', ingredientController.deleteIngredient);
+router.get('/getAllIngredients', ingredientController.getAllIngredients);
+router.get('/getIngredientById/:id', ingredientController.getIngredientById);
+router.post('/createIngredient', ingredientController.createIngredient);
+router.put('/updateIngredient/:id', ingredientController.updateIngredient);
+router.delete('/deleteIngredient/:id', ingredientController.deleteIngredient);
 
 module.exports = router;

@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const paymentMethodController = require('../controllers/PaymentController');
 
-router.get('/', paymentMethodController.getPaymentMethods);
-router.post('/', paymentMethodController.createPaymentMethod);
-router.put('/:id', paymentMethodController.updatePaymentMethod);
-router.delete('/:id', paymentMethodController.deletePaymentMethod);
+router.get('/getPaymentMethods', paymentMethodController.getPaymentMethods);
+router.post('/createPaymentMethod', paymentMethodController.createPaymentMethod);
+router.put('/updatePaymentMethod/:id', paymentMethodController.updatePaymentMethod);
+router.delete('/deletePaymentMethod/:id', paymentMethodController.deletePaymentMethod);
 
 module.exports = router;

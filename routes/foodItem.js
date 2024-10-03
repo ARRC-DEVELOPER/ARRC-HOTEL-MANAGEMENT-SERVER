@@ -1,10 +1,10 @@
-const express = require('express');
-const foodItemController = require('../controllers/FoodItemController');
+const express = require("express");
+const foodItemController = require("../controllers/FoodItemController");
 const router = express.Router();
-const multer = require('multer');
-const multerS3 = require('multer-s3');
-const { S3Client } = require('@aws-sdk/client-s3');
-const path = require('path');
+const multer = require("multer");
+const multerS3 = require("multer-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+const path = require("path");
 
 // Create S3 client using AWS SDK v3
 const s3Client = new S3Client({
@@ -29,10 +29,18 @@ const upload = multer({
   }),
 });
 
-router.post('/', upload.single('image'), foodItemController.createFoodItem);
-router.get('/', foodItemController.getAllFoodItems);
-router.get('/:id', foodItemController.getFoodItemById);
-router.put('/:id', upload.single('image'), foodItemController.updateFoodItem);
-router.delete('/:id', foodItemController.deleteFoodItem);
+router.post(
+  "/createFoodItem",
+  upload.single("image"),
+  foodItemController.createFoodItem
+);
+router.get("/getAllFoodItems", foodItemController.getAllFoodItems);
+router.get("/getFoodItemById:id", foodItemController.getFoodItemById);
+router.put(
+  "/updateFoodItem/:id",
+  upload.single("image"),
+  foodItemController.updateFoodItem
+);
+router.delete("/deleteFoodItem/:id", foodItemController.deleteFoodItem);
 
 module.exports = router;

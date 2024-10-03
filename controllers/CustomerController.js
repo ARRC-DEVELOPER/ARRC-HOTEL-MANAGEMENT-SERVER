@@ -1,16 +1,32 @@
 const Customer = require("../models/Customers");
+const { userServices } = require("../services/userServices.js");
+const { findUser } = userServices;
 
-// Get all customers
 exports.getAllCustomers = async (req, res) => {
+  const { search } = req.query;
+
   try {
-    const customers = await Customer.find();
-    res.status(200).json(customers);
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
+        ],
+      };
+    }
+
+    const customers = await Customer.find(query);
+    return res.status(200).json({
+      success: true,
+      message: "Customers fetched successfully!",
+      customers,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get a customer by ID
 exports.getCustomerById = async (req, res) => {
   try {
     const customer = await Customer.findById(req.params.id);
@@ -22,21 +38,27 @@ exports.getCustomerById = async (req, res) => {
   }
 };
 
-// Create a new customer
 exports.createCustomer = async (req, res) => {
   try {
+    const user = await findUser(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const customer = new Customer(req.body);
+    customer.updatedBy = user.username;
     await customer.save();
-    res.status(201).json(customer);
+
+    return res.status(201).json({
+      success: true,
+      message: "Customer added successfully!",
+      customer,
+    });
   } catch (error) {
-    console.error("Error creating customer:", error);
-    res
-      .status(400)
-      .json({ message: "Failed to create customer", error: error.message });
+    res.status(400).json({ message: error.message });
+    console.log(error);
   }
 };
-
-// Update a customer
 
 exports.updateCustomer = async (req, res) => {
   try {

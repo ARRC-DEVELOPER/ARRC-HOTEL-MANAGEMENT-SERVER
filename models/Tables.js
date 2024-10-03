@@ -5,10 +5,12 @@ const tableSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+
   image: {
     type: String,
     required: true
   },
+  
   reserved: {
     type: Boolean,
     default: false

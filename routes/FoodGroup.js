@@ -28,16 +28,10 @@ const upload = multer({
     },
   }),
 });
-// Route to create a new food group
-router.post("/", upload.single("image"), foodGroupController.createFoodGroup);
 
-// Route to get all food groups
-router.get("/", foodGroupController.getFoodGroups);
-
-// Route to update a food group by ID
-router.put("/:id", upload.single("image"), foodGroupController.updateFoodGroup);
-
-// Route to delete a food group by ID
-router.delete("/:id", foodGroupController.deleteFoodGroup);
+router.post("/createFoodGroup", upload.single("image"), foodGroupController.createFoodGroup);
+router.get("/getFoodGroups", foodGroupController.getFoodGroups);
+router.put("/updateFoodGroup:id", upload.single("image"), foodGroupController.updateFoodGroup);
+router.delete("/deleteFoodGroup:id", foodGroupController.deleteFoodGroup);
 
 module.exports = router;

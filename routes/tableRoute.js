@@ -30,9 +30,9 @@ const upload = multer({
 });
 
 // Routes
-router.get('/', tableController.getAllTables);
-router.post('/', upload.single('image'), tableController.addTable);
-router.put('/:id',  upload.single('image'),tableController.updateTable);
-router.delete('/:id', tableController.deleteTable);
+router.get('/getAllTables', tableController.getAllTables);
+router.post('/addTable', upload.single('image'), tableController.addTable);
+router.put('/updateTable/:id',  upload.single('image'),tableController.updateTable);
+router.delete('/deleteTable/:id', tableController.deleteTable);
 
 module.exports = router;

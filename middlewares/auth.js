@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
-const { userServices } = require("../services/userServices.js")
+const { userServices } = require("../services/userServices.js");
 const { findUser } = userServices;
 
 const isAuthenticated = async (req, res, next) => {
-  const { token } = req.cookies;
+  const token = req.cookies.token;
 
   if (!token) return res.status(404).json({ message: "User not found" });
 
