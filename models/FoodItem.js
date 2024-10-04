@@ -11,7 +11,7 @@ const ingredientSchema = new mongoose.Schema({
     default: "N/A",
     enum: ["In Stock", "Out of Stock", "Low Stock", "N/A"],
   },
-  
+
   consumption: {
     type: String,
     default: "N/A",
@@ -40,6 +40,11 @@ const foodItemSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
+    },
+
+    saleQuantity: {
+      type: Number,
+      default: 0,
     },
 
     image: {

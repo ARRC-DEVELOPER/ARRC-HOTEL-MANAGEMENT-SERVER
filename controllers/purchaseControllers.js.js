@@ -1,6 +1,7 @@
 const Purchase = require("../models/Purchase");
 const { userServices } = require("../services/userServices.js");
 const { findUser } = userServices;
+const moment = require("moment");
 
 exports.getAllPurchases = async (req, res) => {
   try {
@@ -71,6 +72,72 @@ exports.filterPurchases = async (req, res) => {
       success: false,
       message: "Error while fetching filtered Purchase reports",
     });
+  }
+};
+
+exports.getAllExpenses = async (req, res) => {
+  try {
+    const { from, to, period } = req.query;
+
+    let startDate = from
+      ? moment(from, "DD-MM-YYYY").startOf("day").toDate()
+      : moment().subtract(1, "year").startOf("day").toDate(); // Default to 1 year ago
+    let endDate = to
+      ? moment(to, "DD-MM-YYYY").endOf("day").toDate()
+      : moment().endOf("day").toDate(); // Default to current date
+
+    const purchases = await Purchase.find({
+      purchaseDate: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    });
+
+    let groupByFormat, periodLabel;
+
+    switch (period) {
+      case "weekly":
+        groupByFormat = "YYYY-WW";
+        periodLabel = (date) =>
+          `Week of ${moment(date).startOf("week").format("DD MMM YYYY")}`;
+        break;
+      case "monthly":
+        groupByFormat = "YYYY-MM";
+        periodLabel = (date) => moment(date).format("MMMM YYYY");
+        break;
+      case "daily":
+      default:
+        groupByFormat = "YYYY-MM-DD";
+        periodLabel = (date) => moment(date).format("DD MMM YYYY");
+        break;
+    }
+
+    const expenseByPeriod = purchases.reduce((acc, purchase) => {
+      const periodKey = moment(purchase.purchaseDate).format(groupByFormat);
+
+      if (!acc[periodKey]) {
+        acc[periodKey] = {
+          period: periodLabel(purchase.purchaseDate),
+          totalExpense: 0,
+          purchases: [],
+        };
+      }
+
+      acc[periodKey].totalExpense += purchase.totalBill;
+      acc[periodKey].purchases.push(purchase);
+
+      return acc;
+    }, {});
+
+    const result = Object.values(expenseByPeriod);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

@@ -6,6 +6,7 @@ const { isAuthenticated } = require("../middlewares/auth.js");
 
 router.get("/getAllPurchases", purchaseController.getAllPurchases);
 router.get("/filterPurchases", purchaseController.filterPurchases);
+router.get("/getAllExpenses", purchaseController.getAllExpenses);
 router.post("/addPurchase", isAuthenticated, purchaseController.addPurchase);
 router.put("/updatePurchase/:id", purchaseController.updatePurchase);
 router.delete("/deletePurchase/:id", purchaseController.deletePurchase);
