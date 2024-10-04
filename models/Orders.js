@@ -104,7 +104,7 @@ const orderSchema = new mongoose.Schema(
     paymentStatus: {
       type: String,
       enum: ["Paid", "Unpaid"],
-      default: "UnPaid",
+      default: "Unpaid",
     },
   },
   { timestamps: true }

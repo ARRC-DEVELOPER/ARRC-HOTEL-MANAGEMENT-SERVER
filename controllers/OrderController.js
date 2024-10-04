@@ -1,4 +1,5 @@
 const Order = require("../models/Orders.js");
+const Customer = require("../models/Customers");
 const { userServices } = require("../services/userServices.js");
 const { findUser } = userServices;
 
@@ -17,12 +18,15 @@ exports.createOrder = async (req, res) => {
     pickupDetails,
   } = req.body;
 
-  console.log(req.body);
-
   try {
     const user = await findUser(req.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    const customerPurchase = await Customer.findById(customer);
+    if (!customerPurchase) {
+      return res.status(404).json({ message: "Customer not found" });
     }
 
     const newOrder = new Order({
@@ -40,7 +44,11 @@ exports.createOrder = async (req, res) => {
       pickupDetails: orderType === "Pickup" ? pickupDetails : undefined,
     });
 
-    await newOrder.save();
+    const savedOrder = await newOrder.save();
+    if (savedOrder.paymentStatus == "Unpaid") {
+      customerPurchase.dues += savedOrder.totalPrice;
+    }
+    customerPurchase.save();
 
     return res
       .status(201)
