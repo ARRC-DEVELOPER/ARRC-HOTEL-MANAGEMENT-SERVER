@@ -28,6 +28,11 @@ const supplierSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
+    dues: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

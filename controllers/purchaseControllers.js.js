@@ -1,4 +1,5 @@
 const Purchase = require("../models/Purchase");
+const Supplier = require("../models/Supplier");
 const { userServices } = require("../services/userServices.js");
 const { findUser } = userServices;
 const moment = require("moment");
@@ -81,10 +82,10 @@ exports.getAllExpenses = async (req, res) => {
 
     let startDate = from
       ? moment(from, "DD-MM-YYYY").startOf("day").toDate()
-      : moment().subtract(1, "year").startOf("day").toDate(); // Default to 1 year ago
+      : moment().subtract(1, "year").startOf("day").toDate();
     let endDate = to
       ? moment(to, "DD-MM-YYYY").endOf("day").toDate()
-      : moment().endOf("day").toDate(); // Default to current date
+      : moment().endOf("day").toDate();
 
     const purchases = await Purchase.find({
       purchaseDate: {
@@ -159,6 +160,13 @@ exports.addPurchase = async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
+  const supplier = await Supplier.findById(supplierId);
+  if (!supplier) {
+    return res.status(404).json({ message: "Supplier not found" });
+  }
+
+  supplier.dues += dueAmount;
+
   const newPurchase = new Purchase({
     supplierId,
     ingredientId,
@@ -174,6 +182,7 @@ exports.addPurchase = async (req, res) => {
 
   try {
     const purchase = await newPurchase.save();
+    supplier.save();
     res.status(201).json({
       success: true,
       message: "New Purchase Added",

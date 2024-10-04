@@ -3,7 +3,7 @@ const { userServices } = require("../services/userServices.js");
 const { findUser } = userServices;
 
 exports.getAllCustomers = async (req, res) => {
-  const { search } = req.query;
+  const { search, from, to } = req.query;
 
   try {
     let query = {};
@@ -14,6 +14,16 @@ exports.getAllCustomers = async (req, res) => {
           { phone: { $regex: search, $options: "i" } },
         ],
       };
+    }
+
+    if (from || to) {
+      query.updatedAt = {};
+      if (from) {
+        query.updatedAt.$gte = new Date(from);
+      }
+      if (to) {
+        query.updatedAt.$lte = new Date(to);
+      }
     }
 
     const customers = await Customer.find(query);

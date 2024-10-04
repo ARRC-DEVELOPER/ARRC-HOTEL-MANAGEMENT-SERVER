@@ -1,12 +1,16 @@
 // controllers/supplierController.js
 
-const Supplier = require('../models/Supplier'); // Adjust path as needed
+const Supplier = require("../models/Supplier");
 
-// Create a new supplier
 exports.createSupplier = async (req, res) => {
   try {
     const { supplierName, email, phoneNumber, address } = req.body;
-    const newSupplier = new Supplier({ supplierName, email, phoneNumber, address });
+    const newSupplier = new Supplier({
+      supplierName,
+      email,
+      phoneNumber,
+      address,
+    });
     await newSupplier.save();
     res.status(201).json(newSupplier);
   } catch (error) {
@@ -14,22 +18,34 @@ exports.createSupplier = async (req, res) => {
   }
 };
 
-// Get all suppliers
 exports.getSuppliers = async (req, res) => {
+  const { from, to } = req.query;
+
   try {
-    const suppliers = await Supplier.find();
+    const filter = {};
+
+    if (from || to) {
+      filter.updatedAt = {};
+      if (from) {
+        filter.updatedAt.$gte = new Date(from);
+      }
+      if (to) {
+        filter.updatedAt.$lte = new Date(to);
+      }
+    }
+
+    const suppliers = await Supplier.find(filter);
     res.status(200).json(suppliers);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-// Get supplier by ID
 exports.getSupplierById = async (req, res) => {
   try {
     const supplier = await Supplier.findById(req.params.id);
     if (!supplier) {
-      return res.status(404).json({ error: 'Supplier not found' });
+      return res.status(404).json({ error: "Supplier not found" });
     }
     res.status(200).json(supplier);
   } catch (error) {
@@ -37,7 +53,6 @@ exports.getSupplierById = async (req, res) => {
   }
 };
 
-// Update supplier by ID
 exports.updateSupplier = async (req, res) => {
   try {
     const { supplierName, email, phoneNumber, address } = req.body;
@@ -47,7 +62,7 @@ exports.updateSupplier = async (req, res) => {
       { new: true }
     );
     if (!updatedSupplier) {
-      return res.status(404).json({ error: 'Supplier not found' });
+      return res.status(404).json({ error: "Supplier not found" });
     }
     res.status(200).json(updatedSupplier);
   } catch (error) {
@@ -55,14 +70,13 @@ exports.updateSupplier = async (req, res) => {
   }
 };
 
-// Delete supplier by ID
 exports.deleteSupplier = async (req, res) => {
   try {
     const supplier = await Supplier.findByIdAndDelete(req.params.id);
     if (!supplier) {
-      return res.status(404).json({ error: 'Supplier not found' });
+      return res.status(404).json({ error: "Supplier not found" });
     }
-    res.status(200).json({ message: 'Supplier deleted successfully' });
+    res.status(200).json({ message: "Supplier deleted successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
