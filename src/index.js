@@ -54,7 +54,7 @@ const hostname = process.env.HOSTNAME || "localhost";
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://arrc-hotel-management-frontend.vercel.app/"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -68,6 +68,15 @@ app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "This is server for ARRC-HOTEL-MANAGEMENT",
+    developer: "Krushna Dike",
+    manager: "Rahul Jadhav",
+  });
+});
+
 app.use("/api/v1/purchase", purchaseRoutes);
 app.use("/api/v1/cart", cartRoute);
 app.use("/api/v1/order", orderRoute);
@@ -112,15 +121,6 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
-
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "This is server for ARRC-HOTEL-MANAGEMENT",
-    developer: "Krushna Dike",
-    manager: "Rahul Jadhav"
-  })
-})
 
 // Start the server
 app.listen(port, "0.0.0.0", () => {
