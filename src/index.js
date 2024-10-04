@@ -113,6 +113,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Internal Server Error" });
 });
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "This is server for ARRC-HOTEL-MANAGEMENT",
+    developer: "Krushna Dike",
+    manager: "Rahul Jadhav"
+  })
+})
+
 // Start the server
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running at http://${hostname}:${port}`);
