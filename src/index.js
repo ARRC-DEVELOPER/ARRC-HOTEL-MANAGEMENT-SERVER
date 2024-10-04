@@ -54,7 +54,7 @@ const hostname = process.env.HOSTNAME || "localhost";
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://arrc-hotel-management-frontend.vercel.app/"],
+    origin: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
