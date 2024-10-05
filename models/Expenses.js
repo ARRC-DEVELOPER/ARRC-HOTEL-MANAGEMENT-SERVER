@@ -6,7 +6,7 @@ const expenseSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   note: { type: String },
   updatedAt: { type: Date, default: Date.now },
-  updatedBy: { type: String }, // Or you can use ObjectId if you have a User model
+  updatedBy: { type: String },
 });
 
 module.exports = mongoose.model('Expense', expenseSchema);

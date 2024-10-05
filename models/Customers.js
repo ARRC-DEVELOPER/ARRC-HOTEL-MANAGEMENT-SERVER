@@ -26,6 +26,11 @@ const customerSchema = new mongoose.Schema(
     updatedBy: {
       type: String,
     },
+
+    dues: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

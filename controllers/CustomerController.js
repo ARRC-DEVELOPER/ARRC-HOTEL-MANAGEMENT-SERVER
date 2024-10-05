@@ -1,6 +1,10 @@
 const Customer = require("../models/Customers");
 const { userServices } = require("../services/userServices.js");
 const { findUser } = userServices;
+const {
+  salesSummaryStatsServices,
+} = require("../services/salesSummaryStatsServices");
+const { createSalesSummary } = salesSummaryStatsServices;
 
 exports.getAllCustomers = async (req, res) => {
   const { search, from, to } = req.query;
@@ -95,3 +99,7 @@ exports.deleteCustomer = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+Customer.watch().on("change", async (change) => {
+  await createSalesSummary();
+});

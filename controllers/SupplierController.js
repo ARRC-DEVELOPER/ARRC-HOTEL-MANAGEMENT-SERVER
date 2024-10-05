@@ -1,6 +1,8 @@
-// controllers/supplierController.js
-
 const Supplier = require("../models/Supplier");
+const {
+  salesSummaryStatsServices,
+} = require("../services/salesSummaryStatsServices");
+const { createSalesSummary } = salesSummaryStatsServices;
 
 exports.createSupplier = async (req, res) => {
   try {
@@ -81,3 +83,7 @@ exports.deleteSupplier = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+Supplier.watch().on("change", async (change) => {
+  await createSalesSummary();
+});

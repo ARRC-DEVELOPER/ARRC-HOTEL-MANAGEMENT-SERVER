@@ -2,6 +2,10 @@ const Order = require("../models/Orders.js");
 const Customer = require("../models/Customers");
 const { userServices } = require("../services/userServices.js");
 const { findUser } = userServices;
+const {
+  salesSummaryStatsServices,
+} = require("../services/salesSummaryStatsServices");
+const { createSalesSummary } = salesSummaryStatsServices;
 
 exports.createOrder = async (req, res) => {
   const {
@@ -209,3 +213,7 @@ exports.updateOrderStatus = async (req, res) => {
     });
   }
 };
+
+Order.watch().on("change", async (change) => {
+  await createSalesSummary();
+});

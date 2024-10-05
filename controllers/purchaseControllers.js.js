@@ -3,6 +3,10 @@ const Supplier = require("../models/Supplier");
 const { userServices } = require("../services/userServices.js");
 const { findUser } = userServices;
 const moment = require("moment");
+const {
+  salesSummaryStatsServices,
+} = require("../services/salesSummaryStatsServices");
+const { createSalesSummary } = salesSummaryStatsServices;
 
 exports.getAllPurchases = async (req, res) => {
   try {
@@ -216,3 +220,7 @@ exports.deletePurchase = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+Purchase.watch().on("change", async (change) => {
+  await createSalesSummary();
+});

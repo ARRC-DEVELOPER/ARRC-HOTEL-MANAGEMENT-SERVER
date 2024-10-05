@@ -2,7 +2,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const nodeCron = require("node-cron");
 const { connectDB } = require("../config/db");
+
+const {
+  salesSummaryStatsServices,
+} = require("../services/salesSummaryStatsServices");
+const { createSalesSummary } = salesSummaryStatsServices;
 
 const purchaseRoutes = require("../routes/PurchaseRoutes");
 const tableRoutes = require("../routes/tableRoute");
@@ -37,6 +43,7 @@ const purchaseAccountRoute = require("../routes/purchaseAccountRoutes");
 const payrollRoute = require("../routes/payrollRoutes");
 const cartRoute = require("../routes/cartRoutes");
 const orderRoute = require("../routes/orderRoutes");
+const salesSummaryRoute = require("../routes/salesSummaryStatsRoute");
 const cookieParser = require("cookie-parser");
 
 const path = require("path");
@@ -46,6 +53,15 @@ dotenv.config();
 
 // Connect to the database
 connectDB();
+
+nodeCron.schedule("0 0 * * *", async () => {
+  console.log(`Daily sales summary creation at midnight`);
+  try {
+    await createSalesSummary();
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -78,6 +94,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/purchase", purchaseRoutes);
+app.use("/api/v1/salesSummary", salesSummaryRoute);
 app.use("/api/v1/cart", cartRoute);
 app.use("/api/v1/order", orderRoute);
 app.use("/api/v1/tables", tableRoutes);
