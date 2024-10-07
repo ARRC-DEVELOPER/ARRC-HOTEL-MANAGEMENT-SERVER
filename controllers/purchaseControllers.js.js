@@ -1,12 +1,17 @@
 const Purchase = require("../models/Purchase");
 const Supplier = require("../models/Supplier");
 const { userServices } = require("../services/userServices.js");
+const Account = require("../models/Accounts.js");
 const { findUser } = userServices;
 const moment = require("moment");
 const {
   salesSummaryStatsServices,
 } = require("../services/salesSummaryStatsServices");
 const { createSalesSummary } = salesSummaryStatsServices;
+const { transactionServices } = require("../services/transactionServices.js");
+const { createTransaction } = transactionServices;
+const { expenseServices } = require("../services/expenseServices.js");
+const { createExpense } = expenseServices;
 
 exports.getAllPurchases = async (req, res) => {
   try {
@@ -159,40 +164,71 @@ exports.addPurchase = async (req, res) => {
     purchaseDate,
   } = req.body;
 
-  const user = await findUser(req.userId);
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
-  const supplier = await Supplier.findById(supplierId);
-  if (!supplier) {
-    return res.status(404).json({ message: "Supplier not found" });
-  }
-
-  supplier.dues += dueAmount;
-
-  const newPurchase = new Purchase({
-    supplierId,
-    ingredientId,
-    paymentMethod,
-    description,
-    invoiceNo,
-    totalBill,
-    paidAmount,
-    dueAmount,
-    purchaseDate,
-    updatedBy: user.role,
-  });
-
   try {
+    const account = await Account.findById("67039d62307db2000efaeca8");
+    if (!account) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    if (account.balance < paidAmount) {
+      return res.status(400).json({ message: "Insufficient account balance" });
+    }
+
+    const user = await findUser(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const supplier = await Supplier.findById(supplierId);
+    if (!supplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
+
+    supplier.dues += dueAmount;
+
+    const newPurchase = new Purchase({
+      supplierId,
+      ingredientId,
+      paymentMethod,
+      description,
+      invoiceNo,
+      totalBill,
+      paidAmount,
+      dueAmount,
+      purchaseDate,
+      updatedBy: user.role,
+    });
+
+    await createTransaction({
+      accountId: account._id,
+      accountNumber: account.number,
+      type: "debit",
+      amount: paidAmount,
+      balance: account.balance - paidAmount,
+      description: `Purchase #${newPurchase._id} - Invoice: ${invoiceNo}`,
+    });
+
+    await createExpense({
+      accountId: account._id,
+      accountNumber: account.number,
+      amount: paidAmount,
+      note: `Purchase #${newPurchase._id} - Invoice: ${invoiceNo}`,
+    });
+
+    account.balance -= paidAmount;
+    account.debit += paidAmount;
+    await account.save();
+
     const purchase = await newPurchase.save();
     supplier.save();
+
     res.status(201).json({
       success: true,
       message: "New Purchase Added",
       purchase,
     });
   } catch (err) {
+    console.log(err);
     res.status(400).json({ message: err.message });
   }
 };

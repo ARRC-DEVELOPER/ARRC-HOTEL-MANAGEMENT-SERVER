@@ -11,6 +11,7 @@ const {
 const { createSalesSummary } = salesSummaryStatsServices;
 
 const purchaseRoutes = require("../routes/PurchaseRoutes");
+const otherRoutes = require("../routes/otherRoutes");
 const tableRoutes = require("../routes/tableRoute");
 const foodItemRoutes = require("../routes/foodItem");
 const foodGroupRoutes = require("../routes/FoodGroup");
@@ -94,6 +95,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/purchase", purchaseRoutes);
+app.use("/api/v1/other", otherRoutes);
 app.use("/api/v1/salesSummary", salesSummaryRoute);
 app.use("/api/v1/cart", cartRoute);
 app.use("/api/v1/order", orderRoute);
@@ -102,10 +104,10 @@ app.use("/api/v1/foodItems", foodItemRoutes);
 app.use("/api/v1/foodgroups", foodGroupRoutes);
 app.use("/api", modifierRoutes);
 app.use("/api/v1/ingredients", ingredientRoutes);
-app.use("/api/accounts", accountRoutes);
+app.use("/api/v1/accounts", accountRoutes);
 app.use("/api/deposits", depositRoutes);
 app.use("/api/transfers", transferRoutes);
-app.use("/api/expenses", expenseRoutes);
+app.use("/api/v1/expenses", expenseRoutes);
 app.use("/api/v1/customers", customerRoutes);
 app.use("/api/v1/suppliers", supplierRoutes);
 app.use("/api/departments", departmentRoutes);

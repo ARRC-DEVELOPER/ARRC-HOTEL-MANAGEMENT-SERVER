@@ -82,6 +82,12 @@ const salesSummarySchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    orderTypeSummary: {
+      type: Map,
+      of: Number,
+      default: {},
+    },
   },
   { timestamps: true }
 );

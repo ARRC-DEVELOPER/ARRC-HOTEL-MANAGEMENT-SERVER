@@ -81,6 +81,21 @@ const salesSummaryStatsServices = {
         },
       ]);
 
+      // Counting of orders on the basis of it's type
+      const orderTypeCounts = await Order.aggregate([
+        {
+          $group: {
+            _id: "$orderType",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      const orderTypeSummary = orderTypeCounts.reduce((summary, type) => {
+        summary[type._id] = type.count;
+        return summary;
+      }, {});
+
       // Create or update the sales summary for today
       await SalesSummary.findOneAndUpdate(
         { date: startOfDay },
@@ -93,7 +108,7 @@ const salesSummaryStatsServices = {
           charge,
           total,
           totalExcludingTax,
-          purchase: purchases.length,
+          purchase: expense,
           expense,
           customerDue,
           supplierDue,
@@ -101,6 +116,7 @@ const salesSummaryStatsServices = {
           overAllPurchases: overAllPurchases[0]?.totalPurchases || 0,
           overAllSales: overAllSales[0]?.totalSales || 0,
           overAllExpenses: overAllExpenses[0]?.totalExpenses || 0,
+          orderTypeSummary,
         },
         { upsert: true }
       );

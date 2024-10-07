@@ -1,12 +1,34 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const expenseSchema = new mongoose.Schema({
-  account: { type: mongoose.Schema.Types.ObjectId, ref: 'Account', required: true },
-  date: { type: Date, required: true },
-  amount: { type: Number, required: true },
-  note: { type: String },
-  updatedAt: { type: Date, default: Date.now },
-  updatedBy: { type: String },
-});
+const expenseSchema = new mongoose.Schema(
+  {
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
+      required: true,
+    },
 
-module.exports = mongoose.model('Expense', expenseSchema);
+    accountNumber: {
+      type: Number,
+      required: true,
+    },
+
+    amount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    note: {
+      type: String,
+    },
+
+    updatedBy: {
+      type: String,
+      default: "System",
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Expense", expenseSchema);

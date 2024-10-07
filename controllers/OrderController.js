@@ -1,4 +1,5 @@
 const Order = require("../models/Orders.js");
+const Account = require("../models/Accounts.js");
 const Customer = require("../models/Customers");
 const { userServices } = require("../services/userServices.js");
 const { findUser } = userServices;
@@ -6,6 +7,8 @@ const {
   salesSummaryStatsServices,
 } = require("../services/salesSummaryStatsServices");
 const { createSalesSummary } = salesSummaryStatsServices;
+const { transactionServices } = require("../services/transactionServices.js");
+const { createTransaction } = transactionServices;
 
 exports.createOrder = async (req, res) => {
   const {
@@ -53,6 +56,26 @@ exports.createOrder = async (req, res) => {
       customerPurchase.dues += savedOrder.totalPrice;
     }
     customerPurchase.save();
+
+    const account = await Account.findById("67039d62307db2000efaeca8");
+    if (!account) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    // Create transaction for credit
+    await createTransaction({
+      accountId: account._id,
+      accountNumber: account.number,
+      type: "credit",
+      amount: savedOrder.totalPrice,
+      balance: account.balance + savedOrder.totalPrice,
+      description: `Order #${savedOrder._id} - ${orderType}`,
+    });
+
+    // Update the account's balance and credit
+    account.balance += savedOrder.totalPrice;
+    account.credit += savedOrder.totalPrice;
+    await account.save();
 
     return res
       .status(201)

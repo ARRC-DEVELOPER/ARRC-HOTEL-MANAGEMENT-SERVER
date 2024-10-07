@@ -1,6 +1,5 @@
 const FoodGroup = require("../models/FoodGroups");
 
-// Create a new food group
 exports.createFoodGroup = async (req, res) => {
   try {
     const { groupName, status, updatedBy } = req.body;
@@ -20,7 +19,6 @@ exports.createFoodGroup = async (req, res) => {
   }
 };
 
-// Get all food groups
 exports.getFoodGroups = async (req, res) => {
   try {
     const foodGroups = await FoodGroup.find();
@@ -30,7 +28,6 @@ exports.getFoodGroups = async (req, res) => {
   }
 };
 
-// Update a food group
 exports.updateFoodGroup = async (req, res) => {
   try {
     const { id } = req.params;
@@ -53,7 +50,6 @@ exports.updateFoodGroup = async (req, res) => {
   }
 };
 
-// Delete a food group
 exports.deleteFoodGroup = async (req, res) => {
   try {
     const { id } = req.params;
