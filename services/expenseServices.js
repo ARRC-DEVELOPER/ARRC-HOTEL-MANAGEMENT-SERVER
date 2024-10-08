@@ -13,8 +13,8 @@ const expenseServices = {
     return await Expense.findById(expenseId);
   },
 
-  findAllExpenses: async () => {
-    return await Expense.find();
+  findAllExpenses: async (query) => {
+    return await Expense.find(query);
   },
 };
 

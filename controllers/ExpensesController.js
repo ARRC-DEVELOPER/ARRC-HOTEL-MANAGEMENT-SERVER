@@ -1,10 +1,32 @@
 const Expense = require("../models/Expenses.js");
+const Account = require("../models/Accounts.js");
 const { expenseServices } = require("../services/expenseServices.js");
 const { findAllExpenses } = expenseServices;
 
 exports.getExpenses = async (req, res) => {
+  const { accountId, fromDate, toDate } = req.query;
+
   try {
-    const expenses = await findAllExpenses();
+    let query = {};
+    if (accountId) {
+      const account = await Account.findById(accountId);
+      if (!account) {
+        res.status(404).json({
+          success: false,
+          message: "Account not found",
+        });
+      }
+      query.accountId = accountId;
+    }
+
+    if (fromDate && toDate) {
+      query.createdAt = {
+        $gte: new Date(new Date(fromDate).setHours(0, 0, 0)),
+        $lte: new Date(new Date(toDate).setHours(23, 59, 59)),
+      };
+    }
+
+    const expenses = await findAllExpenses(query);
     res.json({ expenses });
   } catch (error) {
     res.status(500).json({ message: "Server Error" });

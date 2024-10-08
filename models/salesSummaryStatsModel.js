@@ -78,6 +78,16 @@ const salesSummarySchema = new mongoose.Schema(
       default: 0,
     },
 
+    overAllTaxes: {
+      type: Number,
+      default: 0,
+    },
+
+    overAllDiscounts: {
+      type: Number,
+      default: 0,
+    },
+
     overAllExpenses: {
       type: Number,
       default: 0,

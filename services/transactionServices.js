@@ -13,8 +13,8 @@ const transactionServices = {
     return await Transaction.findById(transactionId);
   },
 
-  findAllTransactions: async () => {
-    return await Transaction.find();
+  findAllTransactions: async (query) => {
+    return await Transaction.find(query);
   },
 };
 

@@ -20,8 +20,13 @@ const salesSummaryStatsServices = {
         purchaseDate: { $gte: startOfDay, $lte: endOfDay },
       });
 
-      const customers = await Customer.find({});
-      const suppliers = await Supplier.find({});
+      const customers = await Customer.find({
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
+      });
+
+      const suppliers = await Supplier.find({
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
+      });
 
       // Calculate sales data for today
       const orderQuantity = orders.length;
@@ -72,6 +77,24 @@ const salesSummaryStatsServices = {
         },
       ]);
 
+      const overAllTaxes = await Order.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalTaxes: { $sum: "$tax" },
+          },
+        },
+      ]);
+
+      const overAllDiscounts = await Order.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalDiscounts: { $sum: "$discount" },
+          },
+        },
+      ]);
+
       const overAllExpenses = await Purchase.aggregate([
         {
           $group: {
@@ -83,6 +106,11 @@ const salesSummaryStatsServices = {
 
       // Counting of orders on the basis of it's type
       const orderTypeCounts = await Order.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: startOfDay, $lte: endOfDay },
+          },
+        },
         {
           $group: {
             _id: "$orderType",
@@ -115,6 +143,8 @@ const salesSummaryStatsServices = {
           overAllOrders: overAllOrders[0]?.totalOrders || 0,
           overAllPurchases: overAllPurchases[0]?.totalPurchases || 0,
           overAllSales: overAllSales[0]?.totalSales || 0,
+          overAllTaxes: overAllTaxes[0]?.totalTaxes || 0,
+          overAllDiscounts: overAllDiscounts[0]?.totalDiscounts || 0,
           overAllExpenses: overAllExpenses[0]?.totalExpenses || 0,
           orderTypeSummary,
         },

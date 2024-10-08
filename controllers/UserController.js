@@ -69,6 +69,38 @@ const createUser = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  console.log(req.body);
+
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    res.status(400).json({ message: "Please enter all fields" });
+  }
+
+  if (newPassword != confirmPassword) {
+    res.status(400).json({ message: "Password not matched" });
+  }
+
+  const user = await findUser(req.userId);
+  if (!user) {
+    res.status(404).json({ message: "User Not Found" });
+  }
+
+  const isMatch = await user.comparePassword(oldPassword);
+  if (!isMatch) {
+    res.status(401).json({ message: "Incorrect password!" });
+  }
+
+  user.password = newPassword;
+  user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Password changed successfully.",
+  });
+};
+
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -165,4 +197,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getMyProfile,
+  changePassword,
 };

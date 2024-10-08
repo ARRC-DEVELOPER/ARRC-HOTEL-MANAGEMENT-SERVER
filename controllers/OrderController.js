@@ -1,4 +1,5 @@
 const Order = require("../models/Orders.js");
+const Cart = require("../models/Cart");
 const Account = require("../models/Accounts.js");
 const Customer = require("../models/Customers");
 const { userServices } = require("../services/userServices.js");
@@ -76,6 +77,13 @@ exports.createOrder = async (req, res) => {
     account.balance += savedOrder.totalPrice;
     account.credit += savedOrder.totalPrice;
     await account.save();
+
+    // Clear the user's cart
+    const userCart = await Cart.findOne({ userId: req.userId });
+    if (userCart) {
+      userCart.items = [];
+      await userCart.save();
+    }
 
     return res
       .status(201)

@@ -4,6 +4,18 @@ const salesSummaryController = require("../controllers/salesSummaryStatsControll
 const { isAuthenticated } = require("../middlewares/auth.js");
 
 router.get(
+  "/monthly-summary",
+  isAuthenticated,
+  salesSummaryController.monthlySummary
+);
+
+router.get(
+  "/yearly-summary",
+  isAuthenticated,
+  salesSummaryController.getYearlySalesSummary
+);
+
+router.get(
   "/sales-summary",
   isAuthenticated,
   salesSummaryController.getSalesSummary

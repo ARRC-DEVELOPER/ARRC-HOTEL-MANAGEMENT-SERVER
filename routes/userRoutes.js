@@ -26,11 +26,8 @@ router.get(
   userController.getAllDrivers
 );
 router.get("/getUser/:id", userController.getUserById);
-router.put(
-  "/updateUser/:id",
-  isAuthenticated,
-  userController.updateUser
-);
+router.put("/updateUser/:id", isAuthenticated, userController.updateUser);
+router.put("/changePassword", isAuthenticated, userController.changePassword);
 router.delete(
   "/delteUser/:id",
   isAuthenticated,
